@@ -1,0 +1,413 @@
+---
+title: "Bingo Game"
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document: default
+---
+
+
+I will need to load the tidyverse package, as well as set a seed so my results 
+are saved.
+
+```{r}
+
+# Install Tidyverse
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+install.packages("tidyverse")
+
+# Load Tidyverse package
+library(tidyverse)
+
+# Set seed
+set.seed(567)
+
+```
+
+
+# 1. Create an .R script file that contains only your three Bingo functions from Homework 2 (you may make any edits or updates as you see fit).  Use the source() function to load these functions in an .Rmd document where you will write code and text to answer the following questions.
+
+
+I will use my previously created bingo functions. 
+Please load the following script:
+
+```{r}
+
+# Bingo Functions
+source("Bingo_Functions.R")
+
+```
+
+
+# 2. Frequency of win type:
+
+
+## A. Run your Bingo functions until a game is "won."  Record whether the win is a column, row, and/or diagonal win and record how many numbers were called.
+
+
+For this task, I created a new function that would keep running the function
+to mark a card until the card is a winner. It also records how many numbers
+have been called, and returns a list with the type of Bingo win and the 
+total numbers called during the game.
+
+```{r}
+
+# Play Bingo game
+# Record how many numbers were called, and the type of win
+Play_bingo <- function(){
+  # Create Bingo Card
+  my_bingo_card <- bingo_card()
+  # Create Bingo hopper with numbers from 1 to 75
+  hopper <- sample(1:75)
+  # Start with 0 numbers called
+  numbers_called <- 0
+  # Card starts being a losing card
+  win_type <- "Loser"
+  # Keep playing while card is a losing card.
+  while(bingo_result_checker(my_bingo_card) == "Loser"){
+    # Record how many numbers have been called
+    numbers_called <- numbers_called + 1
+    # Called number is selected from hopper without replacement
+    called_number <- hopper[numbers_called]
+    # Bingo card is marked
+    my_bingo_card <- marked_card(my_bingo_card, called_number)
+    # Current winning status is recorded
+    # Once a card is a winner, win type is recorded
+    win_type <- bingo_result_checker(my_bingo_card)
+  }
+  return(list(
+    # See win type after after a card is a winning card
+    win_type = win_type,
+    # See how many numbers were called in the game
+    numbers_called = numbers_called
+  ))
+}
+
+# Run our function to play a Bingo game, and record the results.
+Play_bingo()
+
+```
+
+In this case, we got a Bingo win in a row after 57 numbers called.
+
+
+## B. Repeat this process for 25 games, and make a bar chart of the numbers of games won by column, row, and diagonal.
+
+
+Using my function from part A., I created a new function that can run multiple 
+games, and return a data frame with the type of win and numbers called for
+each game played.
+
+```{r}
+
+# Play multiple bingo games with our Play_bingo() function
+multiple_games <- function(number_of_games){
+  results <- data.frame(
+    # Record the type of win
+    win_type = character(number_of_games),
+    # Record how many numbers were called each game
+    numbers_called = numeric(number_of_games)
+    )
+  # Repeat for the inputted number of games
+  for(i in 1:number_of_games){
+    # Play a full bingo game
+    game_result <- Play_bingo()
+    # Record the win type of said game
+    results$win_type[i] <- game_result$win_type
+    # Record how many numbers were called in said game
+    results$numbers_called[i] <- game_result$numbers_called
+  }
+  # Show results data frame
+  return(results)
+}
+
+```
+
+Let's use this function to create a data frame with Bingo results for 25 games,
+and take a look at our data frame.
+
+```{r}
+
+# Create data frame with 25 Bingo games played
+bingo_25_games <- multiple_games(25)
+
+# Look at data frame
+bingo_25_games
+
+```
+
+Now let's make a bar chart of our data frame for the 25 Bingo games. I'll set
+the win type in the x-axis so we can see the frequency of wins in the y-axis.
+
+I'll change the titles, labels, and colors of the bars in the chart to make
+it easier to understand.
+
+```{r plots 2, fig.width=6, fig.height=4}
+library(tidyverse)
+
+# Plot of data frame with frequency of wins of each type for 25 games
+bingo_25_games %>% 
+  ggplot(aes(
+    # Win type displayed on x-axis
+    x = win_type, 
+    # Bars in chart are different colors
+    fill = win_type)
+    ) +
+  # Plot is bar chart
+  geom_bar() +
+  # Change x label
+  xlab("Win type") +
+  # Change y label
+  ylab("Number of Bingo wins") +
+  # Change title
+  ggtitle("Number of Bingo wins by win type") +
+  # Change legend title
+  labs(fill = "Number of Bingo wins")
+
+```
+
+## C. Recreate this plot based on 50, 100, and 1000 games.  Describe the results.  Do all win types seem to occur equally as frequently?
+
+
+In our example for the 25 games, the most frequent wins used columns, with the
+least frequent wins using diagonals.
+
+Let's see how this looks using bigger samples of 50, 100, and 1,000 games.
+
+```{r plots 1, fig.width=6, fig.height=4}
+library(tidyverse)
+
+# Plot of frequency of wins of each type for 50 games
+multiple_games(50) %>% 
+  ggplot(aes(
+    # Win type displayed on x-axis
+    x = win_type, 
+    # Bars in chart are different colors
+    fill = win_type)
+  ) +
+  # Plot is bar chart
+  geom_bar() +
+  # Change x label
+  xlab("Win type") +
+  # Change y label
+  ylab("Number of Bingo wins") +
+  # Change title
+  ggtitle("Number of Bingo wins by win type") +
+  # Change legend title
+  labs(fill = "Number of Bingo wins")
+
+# Plot of data frame with frequency of wins of each type for 100 games
+multiple_games(100) %>% 
+  ggplot(aes(
+    # Win type displayed on x-axis
+    x = win_type, 
+    # Bars in chart are different colors
+    fill = win_type)
+  ) +
+  # Plot is bar chart
+  geom_bar() +
+  # Change x label
+  xlab("Win type") +
+  # Change y label
+  ylab("Number of Bingo wins") +
+  # Change title
+  ggtitle("Number of Bingo wins by win type") +
+  # Change legend title
+  labs(fill = "Number of Bingo wins")
+
+# Plot of data frame with frequency of wins of each type for 1000 games
+multiple_games(1000) %>% 
+  ggplot(aes(
+    # Win type displayed on x-axis
+    x = win_type, 
+    # Bars in chart are different colors
+    fill = win_type)
+  ) +
+  # Plot is bar chart
+  geom_bar() +
+  # Change x label
+  xlab("Win type") +
+  # Change y label
+  ylab("Number of Bingo wins") +
+  # Change title
+  ggtitle("Number of Bingo wins by win type") +
+  # Change legend title
+  labs(fill = "Number of Bingo wins")
+
+```
+
+As we can see from these charts, wins using diagonals seems to be consistently
+significantly lower than those using rows or columns. This makes sense given
+than there is only 2 ways to winning a Bingo game using a diagonal, compared to
+5 ways of winning using a row, and 5 ways of winning using a column.
+
+While there is a difference in the amount of wins using rows and columns too,
+it doesn't seem to be as significant.
+
+
+# 3. Now think about the counts of numbers called (i.e., balls pulled from the hopper) before a win is declared.  How does the average count of Bingo numbers called (during each game) change by win type?  Can you explain why this happens? (Hint:  you may need to perform new calculations or make a new plot to answer this question).
+
+
+Let's look at the average of how many numbers were called during a game 
+separated by win type. For this task, I will run out function to play multiple 
+game, in this case for 1,000 games, and then group the result by the type of win, 
+and calculate the mean of how many numbers were called during each game.
+
+```{r}
+
+# Average count of called bingo numbers by win type
+# Play 1000 games
+multiple_games(1000) %>% 
+  # Group results by win type
+  group_by(win_type) %>% 
+  # Calculate average of numbers called per game
+  summarise(
+    mean_numbers_called = mean(numbers_called)
+  )
+
+```
+
+As we can see in our result, the average of how many numbers were called seems
+to be lower for games won with a diagonal compared to games won with a row
+or column.
+
+I believe this is happening because all Bingo wins with diagonal also use the
+free space in the middle, while wins with rows or columns only use the free
+space in 1 out of 5 scenarios.
+
+To test this theory, I want to create a new function that checks the results
+of a bingo game, but this time, records whether the game was won using the
+free space (diagonals, row 3, or columns 3), or was won without using the free
+space (the rest of the rows and columns).
+
+```{r}
+
+# New Bingo result checker formula
+# Return if win used the free space or not
+bingo_checker_free_space <- function(my_marked_card) {
+  # Check for wins that didn't use the free space
+  if(
+    # Rows 1, 2, 4, and 5
+    any(rowSums(my_marked_card[c(1, 2, 4, 5), ]) == 0) | 
+    # Columns 1, 2, 4, and 5
+    any(colSums(my_marked_card[ , c(1, 2, 4, 5)]) == 0)
+    ){
+    # If Bingo, indicate it didn't use the free space
+    "No Free Space"
+  # Check for wins that used the free space  
+  } else if(
+    # Row 3
+    sum(my_marked_card[3, ]) == 0 |
+    # Column 3
+    sum(my_marked_card[ ,3]) == 0 |
+    # Diagonal
+    sum(diag(my_marked_card)) == 0 |
+    # Inverse diagonal
+    sum(diag(my_marked_card[, 5:1])) == 0
+    ){
+    # If Bingo, indicate it used the free space
+    "Free Space"
+    # If no Bingo, card is loser.
+  } else {
+    "Loser"
+  }
+}
+
+```
+
+Using this new function to check for results, I created a new function to play 
+a game until it is won, but this time, instead of recording the type of win, it 
+will record if the win used the free space or not.
+
+```{r}
+
+# Play Bingo game
+# Record how many numbers were called, and usage of free space in win
+Play_free_space <- function(){
+  # Create Bingo Card
+  my_bingo_card <- bingo_card()
+  # Create Bingo hopper with numbers from 1 to 75
+  hopper <- sample(1:75)
+  # Start with 0 numbers called
+  numbers_called <- 0
+  # Card starts being a losing card
+  free_space <- "Loser"
+  # Keep playing while card is a losing card.
+  while(bingo_checker_free_space(my_bingo_card) == "Loser"){
+    # Record how many numbers have been called
+    numbers_called <- numbers_called + 1
+    # Called number is selected from hopper without replacement
+    called_number <- hopper[numbers_called]
+    # Bingo card is marked
+    my_bingo_card <- marked_card(my_bingo_card, called_number)
+    # Current winning status is recorded
+    # Once a card is a winner, record if a free space was used
+    free_space <- bingo_checker_free_space(my_bingo_card)
+  }
+  return(list(
+    # See if winning card used free space
+    free_space = free_space,
+    # See how many numbers were called in the game
+    numbers_called = numbers_called
+  ))
+}
+
+```
+
+Finally, I will create a new function that plays multiple bingo games using our
+new function that plays a game until the card is a winner. This time, the 
+function will return a data frame that includes if the win used a free space
+or not, instead of the win type.
+
+```{r}
+
+# Play multiple Bingo games with our Play_free_space() function.
+multiple_games_free <- function(number_of_games){
+  results <- data.frame(
+    # Record if free space was used
+    free_space = character(number_of_games),
+    # Record how many numbers were called each game
+    numbers_called = numeric(number_of_games)
+  )
+  # Repeat for the inputted number of games
+  for(i in 1:number_of_games){
+    # Play a full bingo game
+    game_result <- Play_free_space()
+    # Record if the win used the free space
+    results$free_space[i] <- game_result$free_space
+    # Record how many numbers were called in said game
+    results$numbers_called[i] <- game_result$numbers_called
+  }
+  # Show results data frame
+  return(results)
+}
+
+```
+
+Now let's look at the average of how many numbers were called separated by 
+whether a win used a free space or not. For this  I will run out function to 
+play multiple games, in this case for 1000 games, and then group the result by 
+the whether the free space was used or not, and calculate the mean of how many 
+numbers were called during each game.
+
+```{r}
+
+# Average count of called bingo numbers by free space usage
+# Play 1000 games
+multiple_games_free(1000) %>% 
+  # Group results by free space usage
+  group_by(free_space) %>% 
+  # Calculate average of numbers called per game
+  summarise(
+    mean_numbers_called = mean(numbers_called)
+  )
+
+```
+
+Based on this result, it does seem that games won using the free space have
+less amount of numbers called on average than games won without using the free
+space.
+
+This would explain why games won using diagonals, which always use the free 
+space, have less numbers called on average than games won using rows or columns.
