@@ -16,7 +16,7 @@ The function that marks the bingo cards takes on the inputs of a bingo card, and
 
 Finally, the function that checks if a card is a winner will check on the marked card, and see if the sum of any row, column, or diagonal is equal to 0 (since our card cells are marked with a 0 for called numbers), and if any of these sums are 0, it will return that the card is a winner and the type of win, otherwise it will return that the card is a loser.  
 
-After having my 3 functions, I wanted to simulate multiple bingo games to check the frequency of each win type (row, column, and diagonal). 
+After having my 3 functions, I wanted to simulate multiple bingo games to check the frequency of each win type (row, column, and diagonal). These simulations can be found on the "Bingo-Game" file.
 
 The first thing I did was create a new function that would play bingo until a card was a winner. This function would generate a bingo card using our previously created function, generate a hopper with all 75 possible numbers in bingo, and record the numbers called and the win type in a game. Then, while a bingo card was still a losing card, it would call a new number from the hopper and keep playing bingo until the card is a winning card, and return the win type and the amount of numbers called in the game.
 
