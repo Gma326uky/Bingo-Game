@@ -45,3 +45,5 @@ One challenge that I encountered in developing my functions was how to check for
 
 Something else that was challenging was checking on if a bingo win used the "Free" space or not. I had to adjust my function that checks on a bingo win, and if the win used the diagonals, or the middle rows or columns, record that it used the "Free" space, otherwise record that it didn't use it. Then I created new functions to play a bingo game, and multiple bingo games, using this new function to check on the results instead.
 
+Finally, for my function of multiple games, I had to figure out how to output a data frame with all results, for which I added for the function to generate a data frame with two variables (win type and numbers called), and then inside the for loop, assigned the results of each iteration of the game to their respective column in the data frame, so it would add a new row to the data frame for each game. After that, I just had to return the data frame to see the results.
+
